@@ -13,9 +13,8 @@ from aiokafka.errors import (
 from aiokafka.record.legacy_records import LegacyRecordBatchBuilder
 from aiokafka.structs import TopicPartition
 from aiokafka.util import (
-    INTEGER_MAX_VALUE, commit_structure_validate, get_running_loop
+    INTEGER_MAX_VALUE, commit_structure_validate, create_task, get_running_loop
 )
-from aiokafka.util import create_task
 
 from .message_accumulator import MessageAccumulator
 from .sender import Sender
