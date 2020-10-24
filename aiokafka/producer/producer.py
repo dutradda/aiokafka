@@ -15,6 +15,7 @@ from aiokafka.structs import TopicPartition
 from aiokafka.util import (
     INTEGER_MAX_VALUE, commit_structure_validate, get_running_loop
 )
+from aiokafka.util import create_task
 
 from .message_accumulator import MessageAccumulator
 from .sender import Sender
@@ -316,7 +317,7 @@ class AIOKafkaProducer(object):
         # If the sender task is down there is no way for accumulator to flush
         if self._sender is not None and self._sender.sender_task is not None:
             await asyncio.wait([
-                self._message_accumulator.close(),
+                create_task(self._message_accumulator.close()),
                 self._sender.sender_task],
                 return_when=asyncio.FIRST_COMPLETED)
 
