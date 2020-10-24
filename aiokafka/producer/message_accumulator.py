@@ -10,7 +10,7 @@ from aiokafka.errors import (KafkaTimeoutError,
 from aiokafka.record.legacy_records import LegacyRecordBatchBuilder
 from aiokafka.record.default_records import DefaultRecordBatchBuilder
 from aiokafka.structs import RecordMetadata
-from aiokafka.util import create_future
+from aiokafka.util import create_future, create_task
 
 
 class BatchBuilder:
@@ -283,9 +283,9 @@ class MessageAccumulator:
                 # We force all buffers to close to finalyze the transaction
                 # scope. We should not add anything to this transaction.
                 batch._builder.close()
-                waiters.append(batch.wait_deliver())
+                waiters.append(create_task(batch.wait_deliver()))
         for batch in self._pending_batches:
-            waiters.append(batch.wait_deliver())
+            waiters.append(create_task(batch.wait_deliver()))
         # Wait for all waiters to finish. We only wait for the scope we defined
         # above, other batches should not be delivered as part of this
         # transaction
