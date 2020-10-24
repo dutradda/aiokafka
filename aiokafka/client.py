@@ -168,11 +168,15 @@ class AIOKafkaClient:
     async def close(self):
         if self._sync_task:
             self._sync_task.cancel()
+            self._md_update_waiter.cancel()
             try:
-                await self._sync_task
-            except asyncio.CancelledError:
+                await asyncio.wait_for(self._sync_task, timeout=1)
+            except (asyncio.CancelledError, asyncio.TimeoutError):
                 pass
             self._sync_task = None
+            self._md_update_waiter = create_future()
+            self._md_update_fut = None
+
         # Be careful to wait for graceful closure of all connections, so we
         # process all pending buffers.
         futs = []
